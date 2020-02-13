@@ -1,0 +1,28 @@
+{
+  "compilerOptions": {
+    "experimentalDecorators": true,
+    "module": "commonjs",
+    "outDir": "./dist/",
+    "rootDir": "./src",
+    "baseUrl": "",
+    "target": "es6",
+    "allowJs": true,
+    "noImplicitAny": true,
+    "removeComments": true,
+    "preserveConstEnums": true,
+    "esModuleInterop": true,
+    "sourceMap": true,
+    "resolveJsonModule": true,
+    "typeRoots": [
+      "typings",
+      "node_modules/@types"
+    ]
+  },
+  "include": [
+    "./src",
+    "typings"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
+}
