@@ -105,6 +105,18 @@ class Benghuai extends BasePlugin {
     })
   }
 
+  @on_command('大小姐十连', {
+    perm: Permission.GROUP
+  })
+  async middleGacha(event: any, data: ICqMessageResponseGroup, message: ICqMessageRawMessageArr) {
+    const _data = await getGacha('middle')
+    if (!_data) return
+    await this.setGroupBan(data.group_id, data.user_id, random(1, 10) * 60)
+    return this.sendMessage({
+      message: `大小姐祈愿结果\n${_initMessage(_data)}\n搞事学园提供技术支持~`,
+      group_id: data.group_id
+    })
+  }
 }
 
 // high是公主，custom是魔女，middle是大小姐，special是魔法少女
