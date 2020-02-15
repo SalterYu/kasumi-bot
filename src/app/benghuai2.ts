@@ -2,7 +2,7 @@ import BasePlugin from "../core/basePlugin";
 import Bot, { checkPerm, Permission } from '../core'
 import { on_command, toService } from "../decorator";
 import Log from "../utils/log";
-import { addDelay, deleteDelay, random } from "../utils";
+import { addDelay, delay, deleteDelay, random } from "../utils";
 import axios from "axios";
 
 const request = require('request')

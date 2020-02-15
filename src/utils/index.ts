@@ -65,4 +65,5 @@ export {
   random,
   addDelay,
   deleteDelay,
+  delay
 }
