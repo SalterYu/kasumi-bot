@@ -135,8 +135,14 @@ class Benghuai extends BasePlugin {
     if (!data.group_id) return
     if (delay[data.group_id] && delay[data.group_id]['getBenghuaiPkg']) return
     let message = data.raw_message
-    if (message.endsWith('崩坏下载链接')) {
-      const param = message.replace('崩坏下载链接', '')
+    if (message === '下载地址' || message === '下载链接') {
+      return this.sendMessage({
+        message: '如需要查询国服崩坏下载地址，则再次发送：国服崩坏下载地址\n当前支持国服，测试服，B服，布卡服，布丁服\n如有疑问请联系master',
+        group_id: data.group_id
+      })
+    }
+    if (message.endsWith('崩坏下载链接') || message.endsWith('崩坏下载地址')) {
+      const param = message.replace('崩坏下载链接', '').replace('崩坏下载地址', '')
       if (!param) {
         return this.sendMessage({
           message: '输入对应服务器的包，如：国服崩坏下载链接',
@@ -216,7 +222,7 @@ const getBHPkg = (text: string, config: IBHPkgConfig[]): IBHPkgConfig => {
   const map: { [key in string]: string[] } = {
     gf: ['gf', '国服'],
     Beta: ['beta', 'Beta', '测试服'],
-    bilibili: ['bilibili', 'B服'],
+    bilibili: ['bilibili', 'B服', 'b服'],
     buka: ['buka', '布卡服'],
     buding: ['buding', '布丁服']
   }
