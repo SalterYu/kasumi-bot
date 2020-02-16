@@ -21,3 +21,7 @@ yarn build
 ```vue
 yarn work
 ```
+
+#### 鸣谢
+<a href="https://github.com/yuudi/yobot">yobot</a>
+<a href="https://github.com/Ice-Cirno/HoshinoBot">hoshino</a>
