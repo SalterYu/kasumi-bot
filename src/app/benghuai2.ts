@@ -4,6 +4,7 @@ import { on_command, toService } from "../decorator";
 import Log from "../utils/log";
 import { addDelay, delay, deleteDelay, random } from "../utils";
 import axios from "axios";
+import MessageManager from "../utils/messageManager";
 
 const request = require('request')
 let isSearched = false
@@ -87,7 +88,7 @@ class Benghuai extends BasePlugin {
     if (!_data) return
     await this.setGroupBan(data.group_id, data.user_id, random(1, 10) * 60)
     return this.sendMessage({
-      message: `魔女祈愿结果\n${ _initMessage(_data) }\n搞事学园提供技术支持~`,
+      message: `${ MessageManager.at(data.user_id) }\n魔女祈愿结果\n${ _initMessage(_data) }\n搞事学园提供技术支持~`,
       group_id: data.group_id
     })
   }
@@ -100,7 +101,7 @@ class Benghuai extends BasePlugin {
     if (!_data) return
     await this.setGroupBan(data.group_id, data.user_id, random(1, 10) * 60)
     return this.sendMessage({
-      message: `公主祈愿结果\n${ _initMessage(_data) }\n搞事学园提供技术支持~`,
+      message: `${ MessageManager.at(data.user_id) }\n公主祈愿结果\n${ _initMessage(_data) }\n搞事学园提供技术支持~`,
       group_id: data.group_id
     })
   }
@@ -113,7 +114,7 @@ class Benghuai extends BasePlugin {
     if (!_data) return
     await this.setGroupBan(data.group_id, data.user_id, random(1, 10) * 60)
     return this.sendMessage({
-      message: `魔法少女祈愿结果\n${ _initMessage(_data) }\n搞事学园提供技术支持~`,
+      message: `${ MessageManager.at(data.user_id) }\n魔法少女祈愿结果\n${ _initMessage(_data) }\n搞事学园提供技术支持~`,
       group_id: data.group_id
     })
   }
@@ -126,7 +127,7 @@ class Benghuai extends BasePlugin {
     if (!_data) return
     await this.setGroupBan(data.group_id, data.user_id, random(1, 10) * 60)
     return this.sendMessage({
-      message: `大小姐祈愿结果\n${ _initMessage(_data) }\n搞事学园提供技术支持~`,
+      message: `${MessageManager.at(data.user_id)}\n大小姐祈愿结果\n${ _initMessage(_data) }\n搞事学园提供技术支持~`,
       group_id: data.group_id
     })
   }
