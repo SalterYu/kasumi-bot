@@ -1,5 +1,5 @@
 import BasePlugin from "../core/basePlugin";
-import Bot, { checkPerm, Permission } from '../core'
+import Bot, { Permission } from '../core'
 import { on_command, toService } from "../decorator";
 import Log from "../utils/log";
 import { addDelay, delay, deleteDelay, random } from "../utils";
@@ -7,7 +7,6 @@ import axios from "axios";
 import MessageManager from "../utils/messageManager";
 
 const request = require('request')
-let isSearched = false
 
 interface IBHPkgConfig {
   id: string,
@@ -31,19 +30,43 @@ class Benghuai extends BasePlugin {
     vague: true,
     perm: Permission.GROUP
   })
-  // @ts-ignore
   async main(event: any, data: ICqMessageResponseGroup, message: ICqMessageRawMessageArr) {
-    if (isSearched) return
+    if (delay[data.group_id] && delay[data.group_id]['装备查询']) return
     if (message[0].type === 'text') {
       const param = message[0].data.text
       const group_id = data.group_id
-      request(`https://api.redbean.tech/illustrate/title/${ encodeURIComponent(param) }`, (error: any, response: any, body: any) => {
-        const data = JSON.parse(body)
-        console.log('data', data)
-        if (data) {
-          let message = ''
-          const fiveStars = data[0]
-          const sixStars = data[1]
+      const url = `https://api.redbean.tech/illustrate/title/${ encodeURIComponent(param) }`
+      const res = await axios({
+        url,
+        method: "get"
+      })
+      const _data = res.data
+      if (_data.length) {
+        let initMsg = (obj: { title: string, type: string, maxLvDesc: string }, obj1: { title: string, type: string, maxLvDesc: string }) => {
+          let msg = ''
+          msg += `${ obj.type }: ${ obj.title }\n`
+          msg += `5★描述: ${ obj.maxLvDesc.substring(9) }\n`
+          msg += `6★描述: ${ obj1.maxLvDesc.substring(9) }`
+          return msg
+        }
+        let message = ''
+        const flagData = _data[0]
+        if (flagData.hasOwnProperty('ultraSkill')) {
+          // 表示使魔
+          const fiveStars = _data[0]
+          const sixStars = _data[1]
+          if (fiveStars) {
+            const { title, rarity } = fiveStars
+            message += `${ title }\n`;
+            message += ['ultraSkill', 'hiddenUltraSkill', 'normalSkill1', 'normalSkill2']
+              .map(item => `${ initMsg(fiveStars[item], sixStars[item]) }\n`).join('\n')
+
+          }
+        }
+        if (flagData.hasOwnProperty('decomposeEquip')) {
+          // 表示普通装备
+          const fiveStars = _data[0]
+          const sixStars = _data[1]
           if (fiveStars) {
             const { prop1, prop2, rarity, title } = fiveStars
             message = `${ rarity }★${ title }\n技能1：${ prop1.title }\n描述：${ prop1.maxLvDesc }\n`
@@ -58,25 +81,24 @@ class Benghuai extends BasePlugin {
               message += `技能2：${ prop2.title }\n描述：${ prop2.maxLvDesc }\n`
             }
           }
-          if (message) {
-            message += `\n搞事学园提供沙雕技术支持~\n\n1 分钟后可以再次查询`
-            isSearched = true
-            setTimeout(() => {
-              isSearched = false
-            }, 60 * 1000)
-            return this.sendMessage({
-              message,
-              group_id
-            })
-          } else {
-            return this.sendMessage({
-              message: '没有查询到装备，请输入确切的装备名',
-              group_id
-            })
-          }
-
         }
-      })
+        if (message) {
+          message += `搞事学园提供沙雕技术支持~\n\n5 分钟后可以再次查询`
+          addDelay(data.group_id, '装备查询')
+          setTimeout(() => {
+            deleteDelay(data.group_id, '装备查询')
+          }, 60 * 1000)
+          return this.sendMessage({
+            message,
+            group_id
+          })
+        } else {
+          return this.sendMessage({
+            message: '没有查询到装备，请输入确切的装备名',
+            group_id
+          })
+        }
+      }
     }
   }
 
@@ -84,9 +106,9 @@ class Benghuai extends BasePlugin {
     perm: Permission.GROUP
   })
   async customGacha(event: any, data: ICqMessageResponseGroup, message: ICqMessageRawMessageArr) {
+    await this.setGroupBan(data.group_id, data.user_id, random(1, 10) * 60)
     const _data = await getGacha('custom')
     if (!_data) return
-    await this.setGroupBan(data.group_id, data.user_id, random(1, 10) * 60)
     return this.sendMessage({
       message: `${ MessageManager.at(data.user_id) }\n魔女祈愿结果\n${ _initMessage(_data) }\n搞事学园提供技术支持~`,
       group_id: data.group_id
@@ -97,9 +119,9 @@ class Benghuai extends BasePlugin {
     perm: Permission.GROUP
   })
   async highGacha(event: any, data: ICqMessageResponseGroup, message: ICqMessageRawMessageArr) {
+    await this.setGroupBan(data.group_id, data.user_id, random(1, 10) * 60)
     const _data = await getGacha('high')
     if (!_data) return
-    await this.setGroupBan(data.group_id, data.user_id, random(1, 10) * 60)
     return this.sendMessage({
       message: `${ MessageManager.at(data.user_id) }\n公主祈愿结果\n${ _initMessage(_data) }\n搞事学园提供技术支持~`,
       group_id: data.group_id
@@ -110,9 +132,9 @@ class Benghuai extends BasePlugin {
     perm: Permission.GROUP
   })
   async specialGacha(event: any, data: ICqMessageResponseGroup, message: ICqMessageRawMessageArr) {
+    await this.setGroupBan(data.group_id, data.user_id, random(1, 10) * 60)
     const _data = await getGacha('special')
     if (!_data) return
-    await this.setGroupBan(data.group_id, data.user_id, random(1, 10) * 60)
     return this.sendMessage({
       message: `${ MessageManager.at(data.user_id) }\n魔法少女祈愿结果\n${ _initMessage(_data) }\n搞事学园提供技术支持~`,
       group_id: data.group_id
@@ -123,11 +145,11 @@ class Benghuai extends BasePlugin {
     perm: Permission.GROUP
   })
   async middleGacha(event: any, data: ICqMessageResponseGroup, message: ICqMessageRawMessageArr) {
+    await this.setGroupBan(data.group_id, data.user_id, random(1, 10) * 60)
     const _data = await getGacha('middle')
     if (!_data) return
-    await this.setGroupBan(data.group_id, data.user_id, random(1, 10) * 60)
     return this.sendMessage({
-      message: `${MessageManager.at(data.user_id)}\n大小姐祈愿结果\n${ _initMessage(_data) }\n搞事学园提供技术支持~`,
+      message: `${ MessageManager.at(data.user_id) }\n大小姐祈愿结果\n${ _initMessage(_data) }\n搞事学园提供技术支持~`,
       group_id: data.group_id
     })
   }
@@ -237,7 +259,6 @@ const getBHPkg = (text: string, config: IBHPkgConfig[]): IBHPkgConfig => {
   }
   return config.find(item => item.name === type)
 }
-
 
 
 export default Benghuai
