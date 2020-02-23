@@ -6,6 +6,8 @@ import * as Fs from 'fs'
 import { IAnyObject } from "../../typings";
 const mkdirp = require('mkdirp')
 
+let retellMap = new Map()
+
 @toService
 class Chat extends BasePlugin {
   constructor(bot: Bot) {
@@ -235,6 +237,30 @@ class Chat extends BasePlugin {
     }
   }
 
+  // 群复读功能
+  async retell(event: any, data: ICqMessageResponseGroup | ICqMessageResponsePrivate) {
+    if (data.message_type === 'private') return
+    const message = data.raw_message
+    const group_id = data.group_id
+    let retellData = retellMap.get(group_id)
+    if (!retellData) retellMap.set(group_id, {message, count: 0})
+    retellData = retellMap.get(group_id)
+    if (retellData.message === message) {
+      retellData.count = retellData.count + 1
+    } else {
+      retellMap.set(group_id, {message, count: 1})
+    }
+    if (retellData.count === 3) {
+      retellMap.set(group_id, {message, count: 0})
+      const res = await this.sendMessage({
+        message,
+        group_id
+      })
+      if (res.status === 'failed') {
+        retellMap.delete(group_id)
+      }
+    }
+  }
 }
 
 function readRepeatJson() {
