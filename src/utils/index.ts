@@ -45,7 +45,7 @@ async function requirePlugins(path: string) {
 
 const isEqualStr = (a: string, b: string) => a.trim() === b.trim()
 
-const random = (min: number = 1, max: number = 10) =>
+const random = (min: number = 1, max: number = 10): number =>
   Math.floor(Math.random() * (max - min + 1)) + min
 
 const addDelay = (group_id: number, funcName: string) => {

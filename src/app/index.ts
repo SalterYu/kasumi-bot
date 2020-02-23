@@ -66,4 +66,36 @@ export default class Index extends BasePlugin{
       }
     }
   }
+
+  @on_command('广播', {
+    perm: Permission.SUPERUSER,
+    vague: true
+  })
+  async broadcast(event: any, data: ICqMessageResponseGroup, message: ICqMessageRawMessageArr) {
+    const self = this
+    const groupList = await this.getGroupList()
+    const group_id = data.group_id
+    let _message = ''
+    if (message[0].type === 'text') _message = message[0].data.text
+    const allGroup = groupList.data.filter(item => item.group_id !== group_id).map(item => item.group_id)
+    const func = allGroup.map(group_id => {
+      return self.sendMessage({
+        group_id,
+        message: `这里是广播通知，内容如下：\n\r${_message}`
+      })
+    })
+    try {
+      await Promise.all(func)
+      this.sendMessage({
+        message: '广播完毕',
+        group_id
+      })
+    } catch (e) {
+      this.sendMessage({
+        message: `广播失败, 错误信息: ${e}`,
+        group_id
+      })
+    }
+  }
+
 }

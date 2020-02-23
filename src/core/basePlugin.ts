@@ -1,25 +1,28 @@
-import CQWebSocket from "cq-websocket";
-import { plugify } from "../decorator";
-import Log from "../utils/log";
-import Bot from "./index";
+import CQWebSocket, { APIResponse } from 'cq-websocket'
+import { plugify } from '../decorator'
+import Log from '../utils/log'
+import Bot from './index'
 
 function ext(text: string) {
-  return function (target: any, name: any, descriptor: any) {
+  return function(target: any, name: any, descriptor: any) {
     const oldValue = descriptor.value
-    descriptor.value = function () {
+    descriptor.value = function() {
       return new Promise((resolve, reject) => {
-        return oldValue.apply(this, arguments).then((res: any) => {
-          if (res.retcode == 0) {
-            Log.Info(`${text}成功`, res);
+        return oldValue
+          .apply(this, arguments)
+          .then((res: any) => {
+            if (res.retcode == 0) {
+              Log.Info(`${text}成功`, res)
+              resolve(res)
+              return
+            }
+            Log.Error(`${text}失败`, res)
             resolve(res)
-            return
-          }
-          Log.Error(`${text}失败`, res);
-          resolve(res);
-        }).catch((err: any) => {
-          Log.Error(`${text}失败`, err);
-          reject(err);
-        });
+          })
+          .catch((err: any) => {
+            Log.Error(`${text}失败`, err)
+            reject(err)
+          })
       })
     }
   }
@@ -27,10 +30,10 @@ function ext(text: string) {
 
 @plugify
 class BasePlugin {
-  bot: CQWebSocket;
+  bot: CQWebSocket
   $bot: Bot
   constructor(bot: Bot) {
-    this.bot = bot.bot;
+    this.bot = bot.bot
     this.$bot = bot
   }
 
@@ -41,9 +44,9 @@ class BasePlugin {
    */
   @ext('发送群组消息')
   sendMsgGroup(message: string, group_id: number) {
-    return this.bot("send_group_msg", {
+    return this.bot('send_group_msg', {
       group_id,
-      message
+      message,
     })
   }
 
@@ -54,9 +57,9 @@ class BasePlugin {
    */
   @ext('发送私聊消息')
   sendPrivateMsg(message: string, user_id: number) {
-    return this.bot("send_private_msg", {
+    return this.bot('send_private_msg', {
       user_id,
-      message
+      message,
     })
   }
 
@@ -67,9 +70,9 @@ class BasePlugin {
    */
   @ext('发送讨论组消息')
   sendDiscussMsg(message: string, discuss_id: number) {
-    return this.bot("send_private_msg", {
+    return this.bot('send_private_msg', {
       discuss_id,
-      message
+      message,
     })
   }
 
@@ -87,20 +90,20 @@ class BasePlugin {
     user_id,
     group_id,
     discuss_id,
-    message_type
+    message_type,
   }: {
-    message: string,
-    user_id?: number,
-    group_id?:number,
-    discuss_id?:number,
-    message_type?: 'private'| 'group' | 'discuss'
+    message: string
+    user_id?: number
+    group_id?: number
+    discuss_id?: number
+    message_type?: 'private' | 'group' | 'discuss'
   }) {
-    return this.bot("send_msg", {
+    return this.bot('send_msg', {
       message,
       user_id,
       group_id,
       discuss_id,
-      message_type
+      message_type,
     })
     // return new Promise((resolve, reject) => {
     //
@@ -112,25 +115,37 @@ class BasePlugin {
     return this.bot('set_group_ban', {
       group_id,
       user_id,
-      duration
+      duration,
     })
   }
 
   @ext('设置管理员')
-  setGroupAdmin(group_id: number, user_id:number, enable: boolean) {
+  setGroupAdmin(group_id: number, user_id: number, enable: boolean) {
     return this.bot('set_group_admin', {
       group_id,
       user_id,
-      enable
+      enable,
     })
   }
 
   @ext('撤回消息')
   deleteMsg(message_id: number) {
     return this.bot('delete_msg', {
-      message_id
+      message_id,
     })
+  }
+
+  @ext('获取群列表')
+  getGroupList() {
+    return this.bot('get_group_list') as Promise<
+      APIResponse<Array<{
+        group_id: number
+        group_name: string
+        max_member_count: number
+        member_count: number
+      }>>
+    >
   }
 }
 
-export default BasePlugin;
+export default BasePlugin
