@@ -234,7 +234,7 @@ const getGacha = (type: 'high' | 'custom' | 'middle' | 'special' | 'festival'): 
 
 const _initMessage = (arr: { title: string, isGod: boolean }[]) => {
   let msg = arr.map(item => {
-    return `${ item.isGod ? ` ⭐️` : ' ' }${ item.title }`
+    return `${ item.isGod ? `  ⭐️` : '  ' }${ item.title }`
   }).join('\n')
   return msg
 }
