@@ -110,7 +110,7 @@ class Benghuai extends BasePlugin {
     const _data = await getGacha('custom')
     if (!_data) return
     return this.sendMessage({
-      message: `${ MessageManager.at(data.user_id) }\n魔女祈愿结果\n${ _initMessage(_data) }\n搞事学园提供技术支持~`,
+      message: `${ MessageManager.at(data.user_id) }\r\n魔女祈愿结果\r\n${ _initMessage(_data) }\r\n搞事学园提供技术支持~`,
       group_id: data.group_id
     })
   }
@@ -119,11 +119,11 @@ class Benghuai extends BasePlugin {
     perm: Permission.GROUP
   })
   async highGacha(event: any, data: ICqMessageResponseGroup, message: ICqMessageRawMessageArr) {
-    await this.setGroupBan(data.group_id, data.user_id, random(1, 10) * 60)
+    // await this.setGroupBan(data.group_id, data.user_id, random(1, 10) * 60)
     const _data = await getGacha('high')
     if (!_data) return
     return this.sendMessage({
-      message: `${ MessageManager.at(data.user_id) }\n公主祈愿结果\n${ _initMessage(_data) }\n搞事学园提供技术支持~`,
+      message: `${ MessageManager.at(data.user_id) }\r\n公主祈愿结果：\r\n${ _initMessage(_data) }\r\n搞事学园提供技术支持~`,
       group_id: data.group_id
     })
   }
@@ -136,7 +136,7 @@ class Benghuai extends BasePlugin {
     const _data = await getGacha('special')
     if (!_data) return
     return this.sendMessage({
-      message: `${ MessageManager.at(data.user_id) }\n魔法少女祈愿结果\n${ _initMessage(_data) }\n搞事学园提供技术支持~`,
+      message: `${ MessageManager.at(data.user_id) }\r\n魔法少女祈愿结果：\n${ _initMessage(_data) }\r\n搞事学园提供技术支持~`,
       group_id: data.group_id
     })
   }
@@ -149,7 +149,7 @@ class Benghuai extends BasePlugin {
     const _data = await getGacha('middle')
     if (!_data) return
     return this.sendMessage({
-      message: `${ MessageManager.at(data.user_id) }\n大小姐祈愿结果\n${ _initMessage(_data) }\n搞事学园提供技术支持~`,
+      message: `${ MessageManager.at(data.user_id) }\r\n大小姐祈愿结果：\r\n${ _initMessage(_data) }\r\n搞事学园提供技术支持~`,
       group_id: data.group_id
     })
   }
@@ -234,7 +234,7 @@ const getGacha = (type: 'high' | 'custom' | 'middle' | 'special' | 'festival'): 
 
 const _initMessage = (arr: { title: string, isGod: boolean }[]) => {
   let msg = arr.map(item => {
-    return `${ item.isGod ? ' [稀有] ' : '' }${ item.title }`
+    return `${ item.isGod ? ` ⭐️` : ' ' }${ item.title }`
   }).join('\n')
   return msg
 }
