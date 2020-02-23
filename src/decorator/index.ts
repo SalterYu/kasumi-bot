@@ -5,7 +5,7 @@ import Log from "../utils/log";
 
 interface ICommandOptions {
   perm?: Permission,
-  vague?: boolean // 是否开启模糊匹配，表示正则表达式匹配，todo：暂不支持含特殊字符的模糊匹配
+  vague?: boolean // 是否开启模糊匹配，表示正则表达式匹配，开启后需要中间加一个空格，例如：指令 值，todo：暂不支持含特殊字符的模糊匹配
 }
 
 function on_command(command: string, options: ICommandOptions = {}) {
@@ -41,10 +41,12 @@ function on_command(command: string, options: ICommandOptions = {}) {
             if (message[0].type === 'text') {
               // 表示command
               const text = message[0].data.text
-              if (text == command) {
-                if (typeof text === 'string') {
-                  oldValue.apply(this, [event, data, message])
-                  return Log.Info(`调用${ name }成功`, data)
+              if (!options.vague) {
+                if (text == command) {
+                  if (typeof text === 'string') {
+                    oldValue.apply(this, [event, data, message])
+                    return Log.Info(`调用${ name }成功`, data)
+                  }
                 }
               }
               if (options.vague) {

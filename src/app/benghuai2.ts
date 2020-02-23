@@ -110,7 +110,7 @@ class Benghuai extends BasePlugin {
     const _data = await getGacha('custom')
     if (!_data) return
     return this.sendMessage({
-      message: `${ MessageManager.at(data.user_id) }\n魔女祈愿结果\n${ _initMessage(_data) }\n搞事学园提供技术支持~`,
+      message: `${ MessageManager.at(data.user_id) }\r\n魔女祈愿结果\r\n${ _initMessage(_data) }\r\n搞事学园提供技术支持~`,
       group_id: data.group_id
     })
   }
@@ -123,7 +123,7 @@ class Benghuai extends BasePlugin {
     const _data = await getGacha('high')
     if (!_data) return
     return this.sendMessage({
-      message: `${ MessageManager.at(data.user_id) }\n公主祈愿结果\n${ _initMessage(_data) }\n搞事学园提供技术支持~`,
+      message: `${ MessageManager.at(data.user_id) }\r\n公主祈愿结果：\r\n${ _initMessage(_data) }\r\n搞事学园提供技术支持~`,
       group_id: data.group_id
     })
   }
@@ -134,9 +134,21 @@ class Benghuai extends BasePlugin {
   async specialGacha(event: any, data: ICqMessageResponseGroup, message: ICqMessageRawMessageArr) {
     await this.setGroupBan(data.group_id, data.user_id, random(1, 10) * 60)
     const _data = await getGacha('special')
-    if (!_data) return
+    if (!_data) {
+      let msgMap: {[key in number]: string} = {
+        1: '魔……魔法少女什么的……不……不存在啦！嘤嘤嘤(╥╯^╰╥)',
+        2: '本萝莉根本找不到叫魔法少女的池子，给本萝莉爬！！！',
+        3: '魔法少女？！那种东西我怎么可能知道啊！',
+        4: '你...你把我弄坏了┭┮﹏┭┮，我找不到魔法少女在哪'
+      }
+      return this.sendMessage({
+        message: msgMap[random(1, 4)],
+        group_id: data.group_id
+      })
+
+    }
     return this.sendMessage({
-      message: `${ MessageManager.at(data.user_id) }\n魔法少女祈愿结果\n${ _initMessage(_data) }\n搞事学园提供技术支持~`,
+      message: `${ MessageManager.at(data.user_id) }\r\n魔法少女祈愿结果：\n${ _initMessage(_data) }\r\n搞事学园提供技术支持~`,
       group_id: data.group_id
     })
   }
@@ -149,7 +161,7 @@ class Benghuai extends BasePlugin {
     const _data = await getGacha('middle')
     if (!_data) return
     return this.sendMessage({
-      message: `${ MessageManager.at(data.user_id) }\n大小姐祈愿结果\n${ _initMessage(_data) }\n搞事学园提供技术支持~`,
+      message: `${ MessageManager.at(data.user_id) }\r\n大小姐祈愿结果：\r\n${ _initMessage(_data) }\r\n搞事学园提供技术支持~`,
       group_id: data.group_id
     })
   }
@@ -215,7 +227,7 @@ class Benghuai extends BasePlugin {
 }
 
 // high是公主，custom是魔女，middle是大小姐，special是魔法少女
-const getGacha = (type: 'high' | 'custom' | 'middle' | 'special' | 'festival'): Promise<{ title: string, isGod: boolean }[]> => {
+const getGacha = (type: 'high' | 'custom' | 'middle' | 'special' | 'festival'): Promise<{ title: string, isGod: boolean }[] | ''> => {
   return new Promise((resolve, reject) => {
     const url = `https://api.redbean.tech/gacha/${ type }`
     request(url, (error: any, response: any, body: any) => {
@@ -227,6 +239,8 @@ const getGacha = (type: 'high' | 'custom' | 'middle' | 'special' | 'festival'): 
       if (res) {
         const arr: { title: string, isGod: boolean }[] = JSON.parse(res)
         resolve(arr)
+      } else {
+        resolve('')
       }
     })
   })
@@ -234,7 +248,7 @@ const getGacha = (type: 'high' | 'custom' | 'middle' | 'special' | 'festival'): 
 
 const _initMessage = (arr: { title: string, isGod: boolean }[]) => {
   let msg = arr.map(item => {
-    return `${ item.isGod ? ' [稀有] ' : '' }${ item.title }`
+    return `${ item.isGod ? `⭐️` : '     ' }${ item.title }`
   }).join('\n')
   return msg
 }
