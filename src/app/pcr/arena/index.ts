@@ -5,8 +5,9 @@ import MessageManager from '../../../utils/messageManager'
 import PcrRole from '../../../model/pcr/role'
 import pcrRoles from '../../../model/pcr/allRoles'
 import { Canvas, Image } from 'canvas'
-import { downloadImageToBase64 } from "../../../utils/image";
+import { downloadImageToBase64 } from '../../../utils/image'
 import mergeImages from '../../../modules/merge-images/index.es2015'
+import { random } from "../../../utils";
 
 // @ts-ignore
 Canvas.Image = Image
@@ -33,30 +34,6 @@ export default class PcrArena extends BasePlugin {
     super(bot)
   }
 
-  @on_command('test', {
-    perm: Permission.GROUP,
-  })
-  async test(event: any, data: ICqMessageResponseGroup) {
-    return this.sendMessage({
-      group_id: data.group_id,
-      message: '1231'
-    })
-  }
-
-  @on_command('jjc搜索', {
-    perm: Permission.GROUP,
-  })
-  async getBattleBefore(
-    event: any,
-    data: ICqMessageResponseGroup,
-    message: ICqMessageRawMessageArr
-  ) {
-     return this.sendMessage({
-      group_id: data.group_id,
-      message: '请输入角色, 用空格分开。例如：jjc搜索 XX XX XX XX XX',
-    })
-  }
-
   @on_command('jjc搜索', {
     perm: Permission.GROUP,
     vague: true,
@@ -66,7 +43,14 @@ export default class PcrArena extends BasePlugin {
     data: ICqMessageResponseGroup,
     message: ICqMessageRawMessageArr
   ) {
+    await this.setGroupBan(data.group_id, data.user_id, 3 * 60)
     let msg = ''
+    if (!message.length) {
+      return this.sendMessage({
+        group_id: data.group_id,
+        message: '请输入角色, 用空格分开。例如：jjc搜索 XX XX XX XX XX',
+      })
+    }
     if (message[0].type === 'text') {
       msg = message[0].data.text
     }
@@ -81,22 +65,22 @@ export default class PcrArena extends BasePlugin {
       if (!role) {
         return this.sendMessage({
           group_id: data.group_id,
-          message: `没找到名为：【${item}】的角色，请联系master增加`
+          message: `没找到名为：【${item}】的角色，请联系master增加`,
         })
       }
     }
     const defs = params.map(item => pcrRoles.searchRoleByAlia(item))
     const keys = defs.map(item => item.JPName)
-    if (keys.length <=3) {
+    if (keys.length <= 3) {
       return this.sendMessage({
         group_id: data.group_id,
-        message: '人数不能小于4'
+        message: '人数不能小于4',
       })
     }
     if (keys.length > 5) {
       return this.sendMessage({
         group_id: data.group_id,
-        message: '人数不能多于5'
+        message: '人数不能多于5',
       })
     }
     const atks: Array<{
@@ -150,17 +134,12 @@ export default class PcrArena extends BasePlugin {
             let loadImgsPromise: Array<Array<Promise<any>>> = []
             for (let item of atks) {
               let temp: any[] = []
-              // message += `${item.roles
-              //   .map((role: any) =>
-              //     MessageManager.image(role.getImageUrl(role._level))
-              //   )
-              //   .join(``)}\n`
               for (let role of item.roles) {
                 temp.push(downloadImageToBase64(role.getImageUrl(role._level)))
               }
               loadImgsPromise.push(temp)
               // loadImgsPromise = item.roles.map((role: any) => downloadImageToBase64(role.getImageUrl(role._level)) )
-              total += `👍 ${ item.good }  👎 ${ item.bad }\n`
+              total += `👍 ${item.good}  👎 ${item.bad}\n`
             }
             let images: any[] = []
             for (let pro of loadImgsPromise) {
@@ -169,33 +148,29 @@ export default class PcrArena extends BasePlugin {
             const b64 = await composeImage(images)
             fs.writeFileSync('./image', MessageManager.image64(b64))
             message = `${MessageManager.image64(b64)}\n`
-            // message = `${MessageManager.image64(b64)}`
-            // Promise.all(loadImgsPromise[0]).then(res => {
-            //   // console.log('res', res)
-            // }).catch(err => {
-            //   console.log(err)
-            // })
-            // console.log(loadImgsPromise)
           } else {
             for (let item of atks) {
-              message += `${ item.roles.map(role => role.CNName).join(`  `) }\n`
-              total += `👍 ${ item.good }  👎 ${ item.bad }\n`
+              message += `${item.roles.map(role => role.CNName).join(`  `)}\n`
+              total += `👍 ${item.good}  👎 ${item.bad}\n`
             }
           }
           return { message, total }
         }
         const sendMsg = await initMessage(atks)
-        let defMsg = `【${(defs.map(item => item.CNName)).join(' ')}】\n`
+        let defMsg = `【${defs.map(item => item.CNName).join(' ')}】\n`
         this.sendMessage({
           group_id: data.group_id,
-          message: `${defMsg}已为${ MessageManager.at(data.user_id) }找到已下${
+          message: `${defMsg}已为${MessageManager.at(data.user_id)}找到已下${
             atks.length
-            }种进攻解法         \n\r${ sendMsg.message }${ sendMsg.total }\nSupport by nomae.net`,
+          }种进攻解法         \n\r${sendMsg.message}${
+            sendMsg.total
+          }\nSupport by nomae.net`,
         })
       })
       .catch(err => {
         console.log('err', err)
         // fs.writeFileSync('./res.json', JSON.stringify(err), 'utf8')
+        this.setGroupBan(data.group_id, data.user_id, 0)
         this.sendMessage({
           group_id: data.group_id,
           message: '网路异常，请重试',
@@ -204,8 +179,7 @@ export default class PcrArena extends BasePlugin {
   }
 }
 
-
-function composeImage(arr: Array<Array<{ src64: string, img64: string }>>) {
+function composeImage(arr: Array<Array<{ src64: string; img64: string }>>) {
   const imageWidth = 200
   const imageHeight = 200
   const length = Math.min(arr.length, 6)
@@ -217,8 +191,8 @@ function composeImage(arr: Array<Array<{ src64: string, img64: string }>>) {
         src: itemB.src64 || '',
         width: imageWidth,
         height: imageHeight,
-        x: (indexB) * imageWidth,
-        y: (indexA) * imageHeight
+        x: indexB * imageWidth,
+        y: indexA * imageHeight,
       }
     })
   })

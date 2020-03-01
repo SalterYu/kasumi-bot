@@ -37,6 +37,7 @@ export default class Index extends BasePlugin {
     vague: true
   })
   async main1(event: any, data: ICqMessageResponseGroup, message: ICqMessageRawMessageArr) {
+    if (!message.length) return
     if (message[0].type === 'text') {
       const serverName = message[0].data.text
       const allService = this.$bot.service
@@ -57,6 +58,7 @@ export default class Index extends BasePlugin {
     vague: true
   })
   async main2(event: any, data: ICqMessageResponseGroup, message: ICqMessageRawMessageArr) {
+    if (!message.length) return
     if (message[0].type === 'text') {
       const serverName = message[0].data.text
       const allService = this.$bot.service
@@ -94,7 +96,6 @@ export default class Index extends BasePlugin {
     const groupList = await this.getGroupList()
     const group_id = data.group_id
     let _message = ''
-    // return console.log('message', message, data.raw_message)
     if (message[0].type === 'text') _message = message[0].data.text
     const allGroup = groupList.data.filter(item => item.group_id !== group_id).map(item => item.group_id)
     const func = allGroup.map(group_id => {

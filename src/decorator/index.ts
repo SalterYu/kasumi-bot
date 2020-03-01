@@ -1,19 +1,22 @@
-import { cqStrToArr, isEqualStr } from "../utils";
-import { checkPerm, Permission } from "../core/";
-import { toTrim } from "../utils/message";
-import Log from "../utils/log";
+import { cqStrToArr, isEqualStr } from '../utils'
+import { checkPerm, Permission } from '../core/'
+import { toTrim } from '../utils/message'
+import Log from '../utils/log'
 
 interface ICommandOptions {
-  perm?: Permission,
+  perm?: Permission
   vague?: boolean // 是否开启模糊匹配，表示正则表达式匹配，开启后需要中间加一个空格，例如：指令 值，todo：暂不支持含特殊字符的模糊匹配
 }
 
 function on_command(command: string, options: ICommandOptions = {}) {
-  return function (target: any, name: any, descriptor: any) {
+  return function(target: any, name: any, descriptor: any) {
     const oldValue = descriptor.value
     oldValue.isCommand = true
     oldValue.command = command
-    descriptor.value = function (event: any, data: ICqMessageResponseGroup | ICqMessageResponsePrivate) {
+    descriptor.value = function(
+      event: any,
+      data: ICqMessageResponseGroup | ICqMessageResponsePrivate
+    ) {
       try {
         let message = data.message
         if (typeof data.message === 'string') {
@@ -29,7 +32,7 @@ function on_command(command: string, options: ICommandOptions = {}) {
               if (text == command) {
                 if (typeof text === 'string') {
                   oldValue.apply(this, [event, data, message])
-                  return Log.Info(`调用${ name }成功`, data)
+                  return Log.Info(`调用${name}成功`, data)
                 }
               }
             }
@@ -45,40 +48,51 @@ function on_command(command: string, options: ICommandOptions = {}) {
                 if (text == command) {
                   if (typeof text === 'string') {
                     oldValue.apply(this, [event, data, message])
-                    return Log.Info(`调用${ name }成功`, data)
+                    return Log.Info(`调用${name}成功`, data)
                   }
                 }
-              }
-              if (options.vague) {
-                const reg = new RegExp(`^${ command }(?=\\s)`)
-                if (reg.test(text) || message.length > 1) {
+              } else if (options.vague) {
+                const reg = new RegExp(`^${command}(?=\\s)`)
+                if (reg.test(text)) {
+                  // 文本匹配成功
                   // 把匹配到的指令去掉
                   const _message = JSON.parse(JSON.stringify(message))
                   _message[0].data.text = text.replace(reg, '').trim()
                   oldValue.apply(this, [event, data, _message])
-                  return Log.Info(`调用${ name }成功`, data)
+                  return Log.Info(`调用${name}成功`, data)
+                } else if (command == text) {
+                  const _message = JSON.parse(JSON.stringify(message))
+                  oldValue.apply(this, [event, data, _message.slice(1)])
+                  return Log.Info(`调用${name}成功`, data)
                 }
               }
             }
           }
 
-          if (message[0].type === 'at' && message[0].data.qq == this.$bot.config.qq && message.length > 1) {
+          if (
+            message[0].type === 'at' &&
+            message[0].data.qq == this.$bot.config.qq &&
+            message.length > 1
+          ) {
             // 表示是艾特
             // 第二个数组的内容为command
             if (message[1].type === 'text') {
               const text = message[1].data.text
               if (isEqualStr(text, command)) {
                 if (typeof text === 'string') {
-                  oldValue.apply(this, [event, data, message.slice(1, message.length)])
-                  return Log.Info(`调用${ name }成功`, data)
+                  oldValue.apply(this, [
+                    event,
+                    data,
+                    message.slice(1, message.length),
+                  ])
+                  return Log.Info(`调用${name}成功`, data)
                 }
               }
             }
           }
-
         }
       } catch (e) {
-        Log.Info(`调用${ name }失败`, data)
+        Log.Info(`调用${name}失败`, data)
       }
     }
     return descriptor
@@ -94,8 +108,4 @@ function toService(target: any) {
   target.isService = true
 }
 
-export {
-  plugify,
-  on_command,
-  toService
-}
+export { plugify, on_command, toService }
