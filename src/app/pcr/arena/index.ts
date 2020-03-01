@@ -156,12 +156,19 @@ export default class PcrArena extends BasePlugin {
           }
           return { message, total }
         }
-        const sendMsg = await initMessage(atks)
+        if (!atks.length) {
+          return this.sendMessage({
+            message: '没有找到进攻方案，但不代表不能解。不要打我嘤嘤嘤(╥╯^╰╥)',
+            group_id: data.group_id
+          })
+        }
+        let _atks = atks.slice(0, 6)
+        const sendMsg = await initMessage(_atks)
         let defMsg = `【${defs.map(item => item.CNName).join(' ')}】\n`
         this.sendMessage({
           group_id: data.group_id,
           message: `${defMsg}已为${MessageManager.at(data.user_id)}找到已下${
-            atks.length
+            _atks.length
           }种进攻解法         \n\r${sendMsg.message}${
             sendMsg.total
           }\nSupport by nomae.net`,
