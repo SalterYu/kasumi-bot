@@ -72,6 +72,19 @@ export default class Index extends BasePlugin {
     }
   }
 
+  @on_command('撤回消息', {
+    perm: Permission.GROUP,
+    vague: true
+  })
+  async main9(event: any, data: ICqMessageResponseGroup, message: ICqMessageRawMessageArr) {
+    if (message[0].type === 'text') {
+      const messageId = +(message[0].data.text)
+      console.log(messageId)
+      if (messageId) return this.deleteMsg(+messageId)
+    }
+
+  }
+
   @on_command('广播', {
     perm: Permission.SUPERUSER,
     vague: true
@@ -81,12 +94,13 @@ export default class Index extends BasePlugin {
     const groupList = await this.getGroupList()
     const group_id = data.group_id
     let _message = ''
+    // return console.log('message', message, data.raw_message)
     if (message[0].type === 'text') _message = message[0].data.text
     const allGroup = groupList.data.filter(item => item.group_id !== group_id).map(item => item.group_id)
     const func = allGroup.map(group_id => {
       return self.sendMessage({
         group_id,
-        message: `这里是广播通知，内容如下：\n\r${ _message }`
+        message: `${ data.raw_message.slice(2).trim() }`
       })
     })
     try {
