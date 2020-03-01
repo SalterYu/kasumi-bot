@@ -51,7 +51,7 @@ function on_command(command: string, options: ICommandOptions = {}) {
               }
               if (options.vague) {
                 const reg = new RegExp(`^${ command }(?=\\s)`)
-                if (reg.test(text)) {
+                if (reg.test(text) || message.length > 1) {
                   // 把匹配到的指令去掉
                   const _message = JSON.parse(JSON.stringify(message))
                   _message[0].data.text = text.replace(reg, '').trim()
