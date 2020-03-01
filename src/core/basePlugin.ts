@@ -146,6 +146,11 @@ class BasePlugin {
       }>>
     >
   }
+
+  @ext('是否可以发送图片')
+  canSendImage() {
+    return this.bot('can_send_image') as Promise<APIResponse<{yes: boolean}>>
+  }
 }
 
 export default BasePlugin

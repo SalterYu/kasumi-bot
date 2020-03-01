@@ -6,6 +6,9 @@
     "rootDir": "./src",
     "baseUrl": "",
     "target": "es6",
+    "lib": [
+      "es2019"
+    ],
     "allowJs": true,
     "noImplicitAny": true,
     "removeComments": true,

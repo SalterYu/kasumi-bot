@@ -1,8 +1,13 @@
 import BasePlugin from "../core/basePlugin";
 import Bot, { Permission } from "../core";
 import { on_command } from "../decorator";
+import axios from "axios";
 
-export default class Index extends BasePlugin{
+const pcrRoles = require('../assets/pcr-roles')
+const FormData = require("form-data")
+
+
+export default class Index extends BasePlugin {
   constructor(bot: Bot) {
     super(bot)
   }
@@ -14,11 +19,11 @@ export default class Index extends BasePlugin{
   async main(event: any, data: ICqMessageResponseGroup) {
     let msg: string = '功能列表：'
     const group_id = data.group_id
-    for(let server of this.$bot.service) {
+    for (let server of this.$bot.service) {
       const config = server.config
       let enable = (config.enable_group.includes(group_id) && !config.disable_group.includes(group_id))
         || (config.enable_on_default && !config.disable_group.includes(group_id))
-      msg += `\n${enable ? 'on' : 'off'} || ${server.serverName.toLowerCase()}`
+      msg += `\n${ enable ? 'on' : 'off' } || ${ server.serverName.toLowerCase() }`
     }
     msg += `\n\n使用 enable | disable 指令启动或者禁用`
     return this.sendMessage({
@@ -39,7 +44,7 @@ export default class Index extends BasePlugin{
         if (serverName.toLowerCase() === server.serverName.toLowerCase()) {
           server.setEnableGroup(data.group_id)
           return this.sendMessage({
-            message: `启用 ${serverName} 成功`,
+            message: `启用 ${ serverName } 成功`,
             group_id: data.group_id
           })
         }
@@ -59,7 +64,7 @@ export default class Index extends BasePlugin{
         if (serverName.toLowerCase() === server.serverName.toLowerCase()) {
           server.setDisableGroup(data.group_id)
           return this.sendMessage({
-            message: `禁用 ${serverName} 成功`,
+            message: `禁用 ${ serverName } 成功`,
             group_id: data.group_id
           })
         }
@@ -81,7 +86,7 @@ export default class Index extends BasePlugin{
     const func = allGroup.map(group_id => {
       return self.sendMessage({
         group_id,
-        message: `这里是广播通知，内容如下：\n\r${_message}`
+        message: `这里是广播通知，内容如下：\n\r${ _message }`
       })
     })
     try {
@@ -92,10 +97,12 @@ export default class Index extends BasePlugin{
       })
     } catch (e) {
       this.sendMessage({
-        message: `广播失败, 错误信息: ${e}`,
+        message: `广播失败, 错误信息: ${ e }`,
         group_id
       })
     }
   }
+
+
 
 }
