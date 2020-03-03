@@ -1,7 +1,6 @@
 import BasePlugin from "../core/basePlugin";
 import Bot, { Permission } from "../core";
 import { on_command } from "../decorator";
-import axios from "axios";
 
 const pcrRoles = require('../assets/pcr-roles')
 const FormData = require("form-data")
@@ -13,7 +12,7 @@ export default class Index extends BasePlugin {
   }
 
 
-  @on_command('lssv', {
+  @on_command('功能列表', {
     perm: Permission.GROUP
   })
   async main(event: any, data: ICqMessageResponseGroup) {
@@ -23,16 +22,40 @@ export default class Index extends BasePlugin {
       const config = server.config
       let enable = (config.enable_group.includes(group_id) && !config.disable_group.includes(group_id))
         || (config.enable_on_default && !config.disable_group.includes(group_id))
-      msg += `\n${ enable ? 'on' : 'off' } || ${ server.serverName.toLowerCase() }`
+      msg += `\n${ enable ? 'on' : 'off' } || ${ (server.serverName || server.name).toLowerCase() }`
     }
-    msg += `\n\n使用 enable | disable 指令启动或者禁用`
+    msg += `\n\n使用 开启 | 关闭 指令启动或者禁用`
+    msg += '\n输入 功能说明 对应的功能 可以查看详细功能说明'
     return this.sendMessage({
       message: msg,
       group_id: data.group_id
     })
   }
 
-  @on_command('enable', {
+  @on_command("功能说明", {
+    perm: Permission.GROUP,
+    vague: true
+  })
+  async actionSpeak(event: any, data: ICqMessageResponseGroup, message: ICqMessageRawMessageArr) {
+    const group_id = data.group_id
+    if (message[0].type === 'text') {
+      const _message = message[0].data.text
+      const services = Array.from(this.$bot.service)
+      const service = services.find(item => item.serverName === _message)
+      if (!service) {
+        return this.sendMessage({
+          group_id,
+          message: "这是个啥功能鸭？"
+        })
+      }
+      return this.sendMessage({
+        group_id,
+        message: `${_message}的功能列表：\n=====================\n${service.actionDes}`
+      })
+    }
+  }
+
+  @on_command("开启", {
     perm: Permission.GROUP_ADMIN,
     vague: true
   })
@@ -53,7 +76,7 @@ export default class Index extends BasePlugin {
     }
   }
 
-  @on_command('disable', {
+  @on_command('关闭', {
     perm: Permission.GROUP_ADMIN,
     vague: true
   })

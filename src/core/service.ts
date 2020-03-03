@@ -2,6 +2,7 @@
 // 采用一个服务一个配置文件，即一个app/*.ts,一个service_config
 
 import * as Path from 'path'
+import { IAnyObject } from "../../typings";
 
 const fs = require('fs')
 
@@ -17,18 +18,27 @@ class Service {
   defaultEnable: boolean
   config: IServiceConfig
   path: string
+  name: string
   plugin: any
+  actionIssue: IAnyObject
+  actionDes: string
 
-  constructor(serverName: string, plugin: any, defaultEnable: boolean = true) {
-    this.serverName = serverName
+  constructor(plugin: any, defaultEnable: boolean = true) {
+    this.name = plugin.name
+    this.serverName = plugin.serverName
     this.defaultEnable = defaultEnable
     this.plugin = plugin
-    this.path = Path.join(__dirname, '../.koishi/service-config', `${ serverName }.json`)
+    this.actionIssue = plugin.actionIssue || {}
+    this.path = Path.join(__dirname, '../.koishi/service-config', `${ this.name }.json`)
     this._init()
   }
 
   _init() {
     this.config = loadServiceConfig(this.serverName, this.path)
+    this.actionDes = Object.keys(this.actionIssue).map((key) => {
+      const value = this.actionIssue[key]
+      return `${key}: ${value}`
+    }).join('\n')
   }
 
   setEnableGroup(group_id: number) {

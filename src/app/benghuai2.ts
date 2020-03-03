@@ -20,18 +20,43 @@ interface IBHPkgConfig {
   android_part_download_url: string
 }
 
-@toService
+@toService('崩坏学园2', {
+  '装备查询': "输入 装备查询 XXX 来查找对应装备",
+  '公主十连': '',
+  '魔女十连': '',
+  '魔法少女十连': '',
+  '大小姐十连': '',
+  '以上功能冷却时间3分钟': ''
+})
 class Benghuai extends BasePlugin {
+  equipSearchSet: Set<number>
+  customGachaSet: Set<number>
+  highGachaSet: Set<number>
+  specialGachaSet: Set<number>
+  middleGachaSet: Set<number>
+
   constructor(bot: Bot) {
     super(bot)
+    this.customGachaSet = new Set<number>()
+    this.highGachaSet = new Set<number>()
+    this.middleGachaSet = new Set<number>()
+    this.specialGachaSet = new Set<number>()
+    this.equipSearchSet = new Set<number>()
   }
 
   @on_command('装备查询', {
     vague: true,
     perm: Permission.GROUP
   })
-  async main(event: any, data: ICqMessageResponseGroup, message: ICqMessageRawMessageArr) {
-    if (delay[data.group_id] && delay[data.group_id]['装备查询']) return
+  async equipSearch(event: any, data: ICqMessageResponseGroup, message: ICqMessageRawMessageArr) {
+    // if (delay[data.group_id] && delay[data.group_id]['装备查询']) return
+    const userId = data.user_id
+    if (this.equipSearchSet.has(userId)) {
+      return this.sendMessage({
+        group_id: data.group_id,
+        message: "三分钟之后再来吧，不然本萝莉会嫌弃你的！(x"
+      })
+    }
     if (message[0].type === 'text') {
       const param = message[0].data.text
       const group_id = data.group_id
@@ -84,10 +109,10 @@ class Benghuai extends BasePlugin {
         }
         if (message) {
           message += `搞事学园提供沙雕技术支持~\n\n5 分钟后可以再次查询`
-          addDelay(data.group_id, '装备查询')
+          this.equipSearchSet.add(userId)
           setTimeout(() => {
-            deleteDelay(data.group_id, '装备查询')
-          }, 60 * 1000)
+            this.equipSearchSet.delete(userId)
+          }, 60 * 1000 * 3)
           return this.sendMessage({
             message,
             group_id
@@ -106,9 +131,20 @@ class Benghuai extends BasePlugin {
     perm: Permission.GROUP
   })
   async customGacha(event: any, data: ICqMessageResponseGroup, message: ICqMessageRawMessageArr) {
-    await this.setGroupBan(data.group_id, data.user_id, random(1, 10) * 60)
+    const userId = data.user_id
+    if (this.customGachaSet.has(userId)) {
+      return this.sendMessage({
+        group_id: data.group_id,
+        message: "三分钟之后再来吧，不然本萝莉会嫌弃你的！(x"
+      })
+    }
+    // await this.setGroupBan(data.group_id, data.user_id, random(1, 10) * 60)
     const _data = await getGacha('custom')
     if (!_data) return
+    this.customGachaSet.add(userId)
+    setTimeout(() => {
+      this.customGachaSet.delete(userId)
+    }, 1000 * 60 * 3)
     return this.sendMessage({
       message: `${ MessageManager.at(data.user_id) }\r\n魔女祈愿结果\r\n${ _initMessage(_data) }\r\n搞事学园提供技术支持~`,
       group_id: data.group_id
@@ -119,9 +155,20 @@ class Benghuai extends BasePlugin {
     perm: Permission.GROUP
   })
   async highGacha(event: any, data: ICqMessageResponseGroup, message: ICqMessageRawMessageArr) {
-    await this.setGroupBan(data.group_id, data.user_id, random(1, 10) * 60)
+    const userId = data.user_id
+    if (this.highGachaSet.has(userId)) {
+      return this.sendMessage({
+        group_id: data.group_id,
+        message: "三分钟之后再来吧，不然本萝莉会嫌弃你的！(x"
+      })
+    }
+    // await this.setGroupBan(data.group_id, data.user_id, random(1, 10) * 60)
     const _data = await getGacha('high')
     if (!_data) return
+    this.highGachaSet.add(userId)
+    setTimeout(() => {
+      this.highGachaSet.delete(userId)
+    }, 1000 * 60 * 3)
     return this.sendMessage({
       message: `${ MessageManager.at(data.user_id) }\r\n公主祈愿结果：\r\n${ _initMessage(_data) }\r\n搞事学园提供技术支持~`,
       group_id: data.group_id
@@ -132,7 +179,14 @@ class Benghuai extends BasePlugin {
     perm: Permission.GROUP
   })
   async specialGacha(event: any, data: ICqMessageResponseGroup, message: ICqMessageRawMessageArr) {
-    await this.setGroupBan(data.group_id, data.user_id, random(1, 10) * 60)
+    // await this.setGroupBan(data.group_id, data.user_id, random(1, 10) * 60)
+    const userId = data.user_id
+    if (this.specialGachaSet.has(userId)) {
+      return this.sendMessage({
+        group_id: data.group_id,
+        message: "三分钟之后再来吧，不然本萝莉会嫌弃你的！(x"
+      })
+    }
     const _data = await getGacha('special')
     if (!_data) {
       let msgMap: {[key in number]: string} = {
@@ -145,8 +199,11 @@ class Benghuai extends BasePlugin {
         message: msgMap[random(1, 4)],
         group_id: data.group_id
       })
-
     }
+    this.specialGachaSet.add(userId)
+    setTimeout(() => {
+      this.specialGachaSet.delete(userId)
+    }, 1000 * 60 * 3)
     return this.sendMessage({
       message: `${ MessageManager.at(data.user_id) }\r\n魔法少女祈愿结果：\n${ _initMessage(_data) }\r\n搞事学园提供技术支持~`,
       group_id: data.group_id
@@ -157,9 +214,20 @@ class Benghuai extends BasePlugin {
     perm: Permission.GROUP
   })
   async middleGacha(event: any, data: ICqMessageResponseGroup, message: ICqMessageRawMessageArr) {
-    await this.setGroupBan(data.group_id, data.user_id, random(1, 10) * 60)
+    // await this.setGroupBan(data.group_id, data.user_id, random(1, 10) * 60)
+    const userId = data.user_id
+    if (this.middleGachaSet.has(userId)) {
+      return this.sendMessage({
+        group_id: data.group_id,
+        message: "三分钟之后再来吧，不然本萝莉会嫌弃你的！(x"
+      })
+    }
     const _data = await getGacha('middle')
     if (!_data) return
+    this.middleGachaSet.add(userId)
+    setTimeout(() => {
+      this.middleGachaSet.delete(userId)
+    }, 1000 * 60 * 3)
     return this.sendMessage({
       message: `${ MessageManager.at(data.user_id) }\r\n大小姐祈愿结果：\r\n${ _initMessage(_data) }\r\n搞事学园提供技术支持~`,
       group_id: data.group_id

@@ -2,6 +2,7 @@ import { cqStrToArr, isEqualStr } from '../utils'
 import { checkPerm, Permission } from '../core/'
 import { toTrim } from '../utils/message'
 import Log from '../utils/log'
+import { IAnyObject } from "../../typings";
 
 interface ICommandOptions {
   perm?: Permission
@@ -104,8 +105,14 @@ function plugify(target: any) {
 }
 
 // 表示这个类作为一个服务, 进行统一管理
-function toService(target: any) {
-  target.isService = true
+function toService(serverName?:string, actionIssue?: IAnyObject) {
+  return (target: any) => {
+    target.isService = true
+    target.serverName = serverName
+    target.actionIssue = actionIssue
+    return target
+  }
+
 }
 
 export { plugify, on_command, toService }
