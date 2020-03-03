@@ -8,16 +8,19 @@ const mkdirp = require('mkdirp')
 
 let retellMap = new Map()
 
-@toService
+@toService('趣聊', {
+  '有人问你答': '用 有人问xxx你答xxx 的形式 可以教本萝莉说话哟，不要乱教我！！',
+  '其他隐藏功能': '慢慢发现(x'
+})
 class Chat extends BasePlugin {
   constructor(bot: Bot) {
     super(bot)
   }
 
   @on_command('禁言', {
-    perm: Permission.GROUP
+    perm: Permission.GROUP_ADMIN
   })
-  async main2(
+  async groupBan(
     event: any,
     data: ICqMessageResponseGroup,
     message: ICqMessageRawMessageArr
@@ -40,7 +43,7 @@ class Chat extends BasePlugin {
   @on_command('设置管理员', {
     perm: Permission.GROUP_ADMIN,
   })
-  async main3(
+  async setAdmin(
     event: any,
     data: ICqMessageResponseGroup,
     message: ICqMessageRawMessageArr
@@ -64,7 +67,7 @@ class Chat extends BasePlugin {
   @on_command('取消管理员', {
     perm: Permission.GROUP_ADMIN,
   })
-  async main4(
+  async cancelAdmin(
     event: any,
     data: ICqMessageResponseGroup,
     message: ICqMessageRawMessageArr
@@ -80,7 +83,7 @@ class Chat extends BasePlugin {
   @on_command('签到', {
     perm: Permission.GROUP
   })
-  async main5(event: any, data: ICqMessageResponseGroup, message: ICqMessageRawMessageArr) {
+  async signIn(event: any, data: ICqMessageResponseGroup, message: ICqMessageRawMessageArr) {
     return this.sendMessage({
       group_id: data.group_id,
       message: '签到个🔨'
@@ -90,7 +93,7 @@ class Chat extends BasePlugin {
   @on_command('我好了', {
     perm: Permission.GROUP
   })
-  async main6(event: any, data: ICqMessageResponseGroup, message: ICqMessageRawMessageArr) {
+  async shele(event: any, data: ICqMessageResponseGroup, message: ICqMessageRawMessageArr) {
     const { superUsers } = this.$bot.config
     await this.sendMessage({
       group_id: data.group_id,
@@ -104,7 +107,7 @@ class Chat extends BasePlugin {
   @on_command('解除禁言', {
     perm: Permission.GROUP_ADMIN
   })
-  async main7(event: any, data: ICqMessageResponseGroup, message: ICqMessageRawMessageArr) {
+  async unsetGroupBan(event: any, data: ICqMessageResponseGroup, message: ICqMessageRawMessageArr) {
     const at: any = message.find(mes => mes.type === 'at')
     if (at) {
       const user_id: any = at.data.qq
@@ -114,7 +117,7 @@ class Chat extends BasePlugin {
   }
 
   @on_command('mua')
-  async main8(event: any, data: ICqMessageResponseGroup, message: ICqMessageRawMessageArr) {
+  async mua(event: any, data: ICqMessageResponseGroup, message: ICqMessageRawMessageArr) {
     const group_id = data.group_id
     return await this.sendMessage({
       group_id,
@@ -138,7 +141,7 @@ class Chat extends BasePlugin {
     perm: Permission.GROUP,
     vague: true
   })
-  async main9(event: any, data: ICqMessageResponseGroup, message: ICqMessageRawMessageArr) {
+  async delMsg(event: any, data: ICqMessageResponseGroup, message: ICqMessageRawMessageArr) {
     if (message[0].type === 'text') {
       const messageId = +(message[0].data.text)
       console.log(messageId)
@@ -181,7 +184,7 @@ class Chat extends BasePlugin {
   @on_command('来一份优质睡眠套餐', {
     perm: Permission.GROUP
   })
-  async main13(event: any, data: ICqMessageResponseGroup, message: ICqMessageRawMessageArr) {
+  async sleep(event: any, data: ICqMessageResponseGroup, message: ICqMessageRawMessageArr) {
     await this.setGroupBan(data.group_id, data.user_id, 8 * 60 * 60)
   }
 

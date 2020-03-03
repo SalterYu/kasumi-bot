@@ -72,18 +72,19 @@ class Bot {
     this.plugins = plugins.map(constructor => {
         if (constructor.isPlugin) {
           if (debug) {
-            if (constructor.name.toLowerCase() === 'test' || constructor.name.toLowerCase() === 'index') {
+            if (constructor.name.toLowerCase() === 'test' || constructor.name.toLowerCase() === 'pcrarena' || constructor.name.toLowerCase() === 'index') {
               if (constructor.isService) {
-                Log.Success("已加载插件：", constructor.name);
-                this.service.add(new Service(constructor.name.toLowerCase(), constructor))
+                Log.Success("已加载插件：", constructor.serverName || constructor.name);
+                this.service.add(new Service(constructor))
               }
               return new constructor(this);
             }
           } else {
             Log.Success("已加载插件：", constructor.name);
             if (constructor.isService) {
-              this.service.add(new Service(constructor.name.toLowerCase(), constructor))
+              this.service.add(new Service(constructor))
             }
+            // 如果不是service，则直接加载，不做记录。
             return new constructor(this);
           }
         } else {

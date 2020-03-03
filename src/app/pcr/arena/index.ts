@@ -28,13 +28,15 @@ interface IPcrBattleResponse {
   eval: number
 }
 
-@toService
+@toService('公主连结竞技场', {
+   'jjc查询': '发送jjc查询 用空格分开。例如：jjc搜索 XX XX XX XX XX 来搜索jjc结果'
+})
 export default class PcrArena extends BasePlugin {
   constructor(bot: Bot) {
     super(bot)
   }
 
-  @on_command('jjc搜索', {
+  @on_command('jjc查询', {
     perm: Permission.GROUP,
     vague: true,
   })

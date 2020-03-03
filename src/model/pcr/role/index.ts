@@ -27,7 +27,7 @@ class PcrRole {
   }
 
   getImageUrl(level: number = 3) {
-    if (level < 3) level = 1
+    if (level < 3) level = 3
     if (level >= 3 && level < 6) level = 3
     if (level === 6) level = 6
     const _id = this.id + level * 10
