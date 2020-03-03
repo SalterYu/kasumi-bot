@@ -45,7 +45,7 @@ export default class PcrArena extends BasePlugin {
     data: ICqMessageResponseGroup,
     message: ICqMessageRawMessageArr
   ) {
-    this.setGroupBan(data.group_id, data.user_id, 3 * 60)
+    this.setGroupBan(data.group_id, data.user_id, 1 * 60)
     let msg = ''
     if (!message.length) {
       return this.sendMessage({
