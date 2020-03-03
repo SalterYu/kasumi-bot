@@ -145,10 +145,16 @@ class Benghuai extends BasePlugin {
     setTimeout(() => {
       this.customGachaSet.delete(userId)
     }, 1000 * 60 * 3)
-    return this.sendMessage({
+    const msg = await this.sendMessage({
       message: `${ MessageManager.at(data.user_id) }\r\n魔女祈愿结果\r\n${ _initMessage(_data) }\r\n搞事学园提供技术支持~`,
       group_id: data.group_id
     })
+    if (msg && msg.status === 'ok') {
+      const msgId = msg.data.message_id
+      setTimeout(() => {
+        this.deleteMsg(msgId)
+      }, 10000)
+    }
   }
 
   @on_command('公主十连', {
@@ -169,10 +175,16 @@ class Benghuai extends BasePlugin {
     setTimeout(() => {
       this.highGachaSet.delete(userId)
     }, 1000 * 60 * 3)
-    return this.sendMessage({
+    const msg = await this.sendMessage({
       message: `${ MessageManager.at(data.user_id) }\r\n公主祈愿结果：\r\n${ _initMessage(_data) }\r\n搞事学园提供技术支持~`,
       group_id: data.group_id
     })
+    if (msg && msg.status === 'ok') {
+      const msgId = msg.data.message_id
+      setTimeout(() => {
+        this.deleteMsg(msgId)
+      }, 10000)
+    }
   }
 
   @on_command('魔法少女十连', {
@@ -204,10 +216,16 @@ class Benghuai extends BasePlugin {
     setTimeout(() => {
       this.specialGachaSet.delete(userId)
     }, 1000 * 60 * 3)
-    return this.sendMessage({
+    const msg = await this.sendMessage({
       message: `${ MessageManager.at(data.user_id) }\r\n魔法少女祈愿结果：\n${ _initMessage(_data) }\r\n搞事学园提供技术支持~`,
       group_id: data.group_id
     })
+    if (msg && msg.status === 'ok') {
+      const msgId = msg.data.message_id
+      setTimeout(() => {
+        this.deleteMsg(msgId)
+      }, 10000)
+    }
   }
 
   @on_command('大小姐十连', {
@@ -228,10 +246,16 @@ class Benghuai extends BasePlugin {
     setTimeout(() => {
       this.middleGachaSet.delete(userId)
     }, 1000 * 60 * 3)
-    return this.sendMessage({
+    const msg = await this.sendMessage({
       message: `${ MessageManager.at(data.user_id) }\r\n大小姐祈愿结果：\r\n${ _initMessage(_data) }\r\n搞事学园提供技术支持~`,
       group_id: data.group_id
     })
+    if (msg && msg.status === 'ok') {
+      const msgId = msg.data.message_id
+      setTimeout(() => {
+        this.deleteMsg(msgId)
+      }, 10000)
+    }
   }
 
   async getBenghuaiPkg(event: any, data: ICqMessageResponseGroup) {

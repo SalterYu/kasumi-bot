@@ -12,15 +12,15 @@ function ext(text: string) {
           .apply(this, arguments)
           .then((res: any) => {
             if (res.retcode == 0) {
-              Log.Info(`${text}成功`, res)
+              Log.Info(`${text}成功`, res, `参数：`, ...arguments)
               resolve(res)
               return
             }
-            Log.Error(`${text}失败`, res)
+            Log.Error(`${text}失败`, res, `参数：`, ...arguments)
             resolve(res)
           })
           .catch((err: any) => {
-            Log.Error(`${text}失败`, err)
+            Log.Error(`${text}失败`, err, `参数：`, ...arguments)
             reject(err)
           })
       })
@@ -104,7 +104,7 @@ class BasePlugin {
       group_id,
       discuss_id,
       message_type,
-    })
+    }) as Promise<APIResponse<{message_id: number}>>
     // return new Promise((resolve, reject) => {
     //
     // });
