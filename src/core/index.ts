@@ -48,7 +48,7 @@ class Bot {
 
     this.bot.on("message", (event, data) => {
       this.plugins.forEach((plugin) => {
-        const enable = checkServiceEnable(this.service, plugin.constructor.name.toLowerCase(), data.group_id)
+        const enable = checkServiceEnable(this.service, plugin.constructor.name, data.group_id)
         if (enable) {
           const funcNames = Object.getOwnPropertyNames(
             plugin.constructor.prototype

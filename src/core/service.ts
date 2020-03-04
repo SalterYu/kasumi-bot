@@ -8,6 +8,7 @@ const fs = require('fs')
 
 interface IServiceConfig {
   name: string
+  serverName: string
   enable_on_default: boolean
   enable_group: number[]
   disable_group: number[]
@@ -34,7 +35,7 @@ class Service {
   }
 
   _init() {
-    this.config = loadServiceConfig(this.serverName, this.path)
+    this.config = loadServiceConfig(this.serverName, this.name, this.path)
     this.actionDes = Object.keys(this.actionIssue).map((key) => {
       const value = this.actionIssue[key]
       return `${key}: ${value}`
@@ -54,9 +55,10 @@ class Service {
   }
 }
 
-const loadServiceConfig = (serverName: string, path: string): IServiceConfig => {
+const loadServiceConfig = (serverName: string, name: string, path: string): IServiceConfig => {
   let config: IServiceConfig = {
-    name: serverName,
+    name,
+    serverName,
     enable_on_default: true,
     enable_group: [],
     disable_group: [],
@@ -74,9 +76,9 @@ const saveServiceConfig = (service: Service, path: string) => {
   fs.writeFileSync(path, JSON.stringify(service.config, null, 2), 'utf8')
 }
 
-export const checkServiceEnable = (service: Set<Service>, serverName: string, group_id: number) => {
+export const checkServiceEnable = (service: Set<Service>, name: string, group_id: number) => {
   const arr = Array.from(service)
-  const _service = arr.find(item => item.serverName === serverName)
+  const _service = arr.find(item => item.name === name)
   if (_service) {
     const config = _service.config
     if (config.disable_group.length && config.disable_group.length) {
