@@ -12,14 +12,9 @@
 yarn
 ```
 
-#### 编译
-```vue
-yarn build
-```
-
 #### 运行
 ```vue
-yarn work
+yarn server
 ```
 
 #### 鸣谢
