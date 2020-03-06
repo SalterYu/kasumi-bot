@@ -45,7 +45,8 @@ export default class PcrArena extends BasePlugin {
     data: ICqMessageResponseGroup,
     message: ICqMessageRawMessageArr
   ) {
-    this.setGroupBan(data.group_id, data.user_id, 1 * 60)
+    // this.setGroupBan(data.group_id, data.user_id, 1 * 60)
+
     let msg = ''
     if (!message.length) {
       return this.sendMessage({
@@ -71,12 +72,13 @@ export default class PcrArena extends BasePlugin {
         })
       }
     }
-    const defs = params.map(item => pcrRoles.searchRoleByAlia(item))
+    const defs = params.filter((item, index, arr) => arr.indexOf(item, 0) === index).map(item => pcrRoles.searchRoleByAlia(item))
     const keys = defs.map(item => item.JPName)
+    console.log(keys)
     if (keys.length <= 3) {
       return this.sendMessage({
         group_id: data.group_id,
-        message: '人数不能小于4',
+        message: '防守人数过少！',
       })
     }
     if (keys.length > 5) {
@@ -91,6 +93,10 @@ export default class PcrArena extends BasePlugin {
       bad: number
       time: string
     }> = []
+    this.sendMessage({
+      group_id: data.group_id,
+      message: '正在帮骑士君查询，等一下下！！'
+    })
     pcrRoles
       .getBattleResult(keys)
       .then(async res => {
@@ -137,7 +143,8 @@ export default class PcrArena extends BasePlugin {
             for (let item of atks) {
               let temp: any[] = []
               for (let role of item.roles) {
-                temp.push(downloadImageToBase64(role.getImageUrl(role._level)))
+                // temp.push(downloadImageToBase64(role.getImageUrl(role._level)))
+                temp.push(role.loadImage(role._level))
               }
               loadImgsPromise.push(temp)
               // loadImgsPromise = item.roles.map((role: any) => downloadImageToBase64(role.getImageUrl(role._level)) )

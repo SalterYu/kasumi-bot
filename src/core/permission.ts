@@ -1,6 +1,7 @@
 // see https://github.com/richardchien/nonebot/blob/master/nonebot/permission.py
 
 import Bot from "./index";
+import { APIResponse } from "cq-websocket";
 
 export enum Permission {
   PRIVATE_FRIEND = 0x0001,  // ==> 0b0001
@@ -61,5 +62,13 @@ export function checkPerm(bot: Bot, ctx: ICqMessageResponseGroup | ICqMessageRes
       }
     }
   }
-  return Boolean(permission_required & permission)
+  const hasPerm = Boolean(permission_required & permission)
+  if (!hasPerm && ctx.message_type === 'group') {
+    bot.bot('send_group_msg', {
+      // message: `权限不足, 您的是${Permission[permission]}, 需要${Permission[permission_required]}`,
+      message: "就凭你还想让本萝莉对你唯命是从？？？做我的朋友吧 (x",
+      group_id: ctx.group_id
+    })
+  }
+  return hasPerm
 }
