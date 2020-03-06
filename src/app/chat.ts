@@ -147,7 +147,6 @@ class Chat extends BasePlugin {
       console.log(messageId)
       if (messageId) return this.deleteMsg(+messageId)
     }
-
   }
 
   @on_command('来一份优质睡眠套餐', {
@@ -159,7 +158,7 @@ class Chat extends BasePlugin {
 
   // 规则回复
   @on_command('*', {
-    perm: Permission.GROUP_ADMIN
+    perm: Permission.GROUP
   })
   async ruleHandler(event: any, data: ICqMessageResponseGroup | ICqMessageResponsePrivate) {
     if (data.message_type === 'private') return
@@ -170,8 +169,13 @@ class Chat extends BasePlugin {
       message: "添加规则的格式不正确，应为：添加规则 re: [key]===[value]的格式"
     })
     if (message.startsWith('添加规则')) {
+      if (!checkPerm(this.$bot, data, Permission.GROUP_ADMIN)){
+        return this.sendMessage({
+          group_id: data.group_id,
+          message: '权限不足'
+        })
+      }
       let _message = message.slice(4).trim()
-
       // 表示正则表达式
       if (_message.startsWith('re:') || _message.startsWith('re：')) {
         _message = _message.slice(3).trim()
@@ -228,6 +232,12 @@ class Chat extends BasePlugin {
     }
 
     if (message.startsWith('删除规则')) {
+      if (!checkPerm(this.$bot, data, Permission.GROUP_ADMIN)){
+        return this.sendMessage({
+          group_id: data.group_id,
+          message: '权限不足'
+        })
+      }
       let _message = message.slice(4).trim()
       const target = rule.find((item: any) => item.key === _message)
       const _rule = rule.filter((item: any) => item.key !== _message)
@@ -243,7 +253,14 @@ class Chat extends BasePlugin {
           message: '删除规则失败，没有这个规则哟~'
         })
       }
+      return
+    }
 
+    if (message === '查看规则') {
+      return this.sendMessage({
+        group_id: data.group_id,
+        message: rule.map((item: any) => `${item.key}  ===>  ${item.value}`).join('\n')
+      })
     }
 
     rule.forEach((item: any) => {
