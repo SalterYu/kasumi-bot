@@ -5,7 +5,7 @@ import axios from 'axios'
 import MessageManager from "../../utils/messageManager";
 
 @toService('setu', {
-  setu: '发送 来份涩图 来份色图 色图 涩图触发功能'
+  '1. setu': '发送 来份涩图 来份色图 色图 涩图触发功能'
 })
 class Setu extends BasePlugin {
   setuUserSet: Set<number>
@@ -36,14 +36,22 @@ class Setu extends BasePlugin {
         // message: '色图'
         message: MessageManager.image(_data.data[0].url)
       })
+      const self = this
       if (msg && msg.status === 'ok') {
         this.setuUserSet.add(userId)
         setTimeout(() => {
           this.setuUserSet.delete(userId)
-        }, 1000 * 60 * 3)
+        }, 1000 * 3 * 60)
         const messageId = msg.data.message_id
         setTimeout(() => {
-          this.deleteMsg(messageId)
+           this.deleteMsg(messageId).then(msg2 => {
+             if (msg2.status === 'failed') {
+               self.sendMessage({
+                 group_id: data.group_id,
+                 message: `setu由于过于OOXX，没法发送，建议去pixiv查看，pid：${_data.data[0].pid}`
+               })
+             }
+           })
         }, 10000)
       }
     }

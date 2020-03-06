@@ -10,3 +10,9 @@ type IAnyObject = Record<string, any>
 export interface IConfig extends CQWebSocketOption {
   superUsers: number[]
 }
+
+
+declare module message {
+  const value: any;
+  export {}
+}

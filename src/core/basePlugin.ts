@@ -12,7 +12,7 @@ function ext(text: string) {
           .apply(this, arguments)
           .then((res: any) => {
             if (res.retcode == 0) {
-              Log.Info(`${text}成功`, res, `参数：`, ...arguments)
+              Log.Info(`${text}成功`, res, `参数：`)
               resolve(res)
               return
             }
