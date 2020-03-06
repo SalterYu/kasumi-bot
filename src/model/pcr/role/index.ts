@@ -66,7 +66,7 @@ class PcrRole {
         const url = this.getImageUrl(this.getId(id))
         return downloadImageToBase64(url).then(res => {
           if (res) {
-            fs.writeFile(iconPath, Buffer.from(res.img64, 'base64'), (err) => {
+            fs.writeFile(iconPath, Buffer.from(res.img64, 'base64'), (err: any) => {
               if (err) {
                 Log.Error('创建图片失败，图片路径', iconPath)
               }
