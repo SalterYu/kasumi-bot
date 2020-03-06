@@ -4,7 +4,6 @@
     "module": "commonjs",
     "outDir": "./dist/",
     "rootDir": "./src",
-    "baseUrl": "",
     "target": "es6",
     "lib": [
       "es2019"
@@ -19,7 +18,11 @@
     "typeRoots": [
       "typings",
       "node_modules/@types"
-    ]
+    ],
+    "baseUrl": ".",
+    "paths": {
+      "@utils": ["./src/utils"]
+    }
   },
   "include": [
     "./src",

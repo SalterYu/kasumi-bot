@@ -2,6 +2,7 @@ import { cqStrToArr } from './message'
 import * as Path from 'path'
 import * as rd from 'rd'
 import { IConfig } from '../../typings'
+import Log from "./log";
 
 const delay: { [group_id in string]: { [func in string]: boolean } } = {}
 
@@ -30,15 +31,19 @@ function initCQWebSocketOptions(config: any): Partial<IConfig> {
 async function requirePlugins(path: string) {
   const _path = Path.join(__dirname, '../', path)
   let files: string[] = []
-  rd.eachFileFilterSync(_path, /\.js$/, (f, s) => {
+  const reg = /\.(js|ts)$/
+  rd.eachFileFilterSync(_path, reg, (f, s) => {
     files.push(f)
   })
   const plugins = []
   for (let file of files) {
-    if (/(.js)$/.test(file)) {
+    if (reg.test(file)) {
       const plugin = await import(file)
       plugins.push(plugin.default)
     }
+  }
+  if (plugins.length === 0) {
+    Log.Info('没有加载的插件，直接启动')
   }
   return plugins
 }

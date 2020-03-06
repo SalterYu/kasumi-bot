@@ -4,7 +4,7 @@ import Bot, { Permission } from '../../core'
 import MessageManager from '../../utils/messageManager'
 
 @toService('公主连结', {
-  'pcr速查': "输入 pcr速查 来查看关于公主连结的一些网站"
+  '1.pcr速查': "输入 pcr速查 来查看关于公主连结的一些网站"
 })
 class Pcr extends BasePlugin {
   constructor(bot: Bot) {

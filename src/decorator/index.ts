@@ -45,7 +45,9 @@ function on_command(command: string, options: ICommandOptions = {}) {
             if (message[0].type === 'text') {
               // 表示command
               const text = message[0].data.text
-              if (!options.vague) {
+              if (command === '*') {
+                oldValue.apply(this, [event, data, message])
+              } else if (!options.vague) {
                 if (text == command) {
                   if (typeof text === 'string') {
                     oldValue.apply(this, [event, data, message])
