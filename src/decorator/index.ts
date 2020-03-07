@@ -77,6 +77,13 @@ function on_command(command: string, options: ICommandOptions = {}) {
               }
             }
           }
+          if (message[0].type === 'image') {
+            if (command === '*') {
+              if (checkPerm(this.$bot, data, options.perm)) {
+                oldValue.apply(this, [event, data, message]);
+              }
+            }
+          }
           if (
             message[0].type === 'at' &&
             message[0].data.qq == this.$bot.config.qq &&
