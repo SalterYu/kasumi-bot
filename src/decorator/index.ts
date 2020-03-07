@@ -86,7 +86,7 @@ function on_command(command: string, options: ICommandOptions = {}) {
             // 第二个数组的内容为command
             if (message[1].type === 'text') {
               const text = message[1].data.text;
-              if (isEqualStr(text, command)) {
+              if (isEqualStr(text, command) || command === '*') {
                 if (typeof text === 'string') {
                   oldValue.apply(this, [
                     event,
