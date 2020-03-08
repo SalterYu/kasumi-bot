@@ -114,6 +114,11 @@ function on_command(command: string, options: ICommandOptions = {}) {
   };
 }
 
+function once(target: any, name: any, descriptor: any) {
+  const oldValue = descriptor.value
+  oldValue.isOnce = true
+}
+
 function plugify(target: any) {
   target.isPlugin = true;
 }
@@ -128,4 +133,4 @@ function toService(serverName?: string, actionIssue?: IAnyObject) {
   };
 }
 
-export { plugify, on_command, toService };
+export { plugify, on_command, toService, once };
