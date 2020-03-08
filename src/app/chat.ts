@@ -104,7 +104,7 @@ class Chat extends BasePlugin {
       message: "不准好，憋回去！"
     })
     if (!superUsers.includes(data.user_id)) {
-      await this.setGroupBan(data.group_id, data.user_id, 300)
+      await this.setGroupBan(data.group_id, data.user_id, 1 * 60)
     }
   }
 

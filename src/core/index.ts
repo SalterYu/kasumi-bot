@@ -53,10 +53,10 @@ class Bot {
           const funcNames = Object.getOwnPropertyNames(
             plugin.constructor.prototype
           );
-          funcNames.forEach(funcName => {
+          funcNames.forEach((funcName: any) => {
             if (funcName !== "constructor") {
               const func = plugin[funcName];
-              func && func.call(plugin, event, data);
+              func && !func.isOnce &&func.call(plugin, event, data);
             }
           });
         }

@@ -2,6 +2,7 @@ import CQWebSocket, { APIResponse } from 'cq-websocket'
 import { plugify } from '../decorator'
 import Log from '../utils/log'
 import Bot from './index'
+import { IAnyObject } from "../../typings";
 
 function ext(text: string) {
   return function(target: any, name: any, descriptor: any) {
@@ -32,11 +33,22 @@ function ext(text: string) {
 class BasePlugin {
   bot: CQWebSocket
   $bot: Bot
+  private __proto__: IAnyObject;
+
   constructor(bot: Bot) {
     this.bot = bot.bot
     this.$bot = bot
+    this._startOnceFunc()
   }
 
+  _startOnceFunc(this: any) {
+    Object.getOwnPropertyNames(this.__proto__).forEach(name => {
+      const func = this[name]
+      if (func && func.isOnce) {
+        func.call(this)
+      }
+    })
+  }
   /**
    * 发送群组消息
    * @param message
