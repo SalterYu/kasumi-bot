@@ -45,7 +45,7 @@ NGA论坛：bbs.nga.cn/thread.php?fid=-10308342
       3: `骑士君快上游戏背刺啦！~(〃'▽'〃)`
     }
     let rule = new schedule.RecurrenceRule();
-    rule.hour = 15
+    rule.hour = 14
     rule.minute = 45
     rule.second = 0
     schedule.scheduleJob(rule, async () => {
