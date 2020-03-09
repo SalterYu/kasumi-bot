@@ -10,6 +10,7 @@ type IAnyObject = Record<string, any>
 export interface IConfig extends CQWebSocketOption {
   superUsers: number[]
   loliConApiKey: string
+  ageType: 0 | 1 | 2
 }
 
 
