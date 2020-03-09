@@ -39,6 +39,7 @@ class Setu extends BasePlugin {
         })
       }
       const apiKey = this.$bot.config.loliConApiKey
+      const ageType = this.$bot.config.ageType
       if (!apiKey) {
         return this.sendMessage({
           group_id: data.group_id,
@@ -46,7 +47,7 @@ class Setu extends BasePlugin {
         })
       }
       this.setuUserSet.add(userId)
-      const res = await axios.get(`https://api.lolicon.app/setu/?size1200=true&&r18=2&&apikey=${ apiKey }`)
+      const res = await axios.get(`https://api.lolicon.app/setu/?size1200=true&&r18=${ageType || 0}&&apikey=${ apiKey }`)
       const _data: any = res.data
       if (_data.code !== 0) {
         return this.sendMessage({
