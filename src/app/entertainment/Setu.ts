@@ -64,7 +64,7 @@ class Setu extends BasePlugin {
           message: _data.msg,
         })
       }
-      savePicture(_data.data[0].url)
+      savePicture(_data.data[0].url, _data.data[0].r18)
 
       const msg: any = await this.sendMessage({
         group_id: data.group_id,
@@ -93,21 +93,26 @@ class Setu extends BasePlugin {
               })
             }
           })
-        }, 1000 * 20)
+        }, 1000 * 16)
       }
     }
   }
 }
 
 // 把 图下载到本地服务器
-function savePicture(url: string) {
+function savePicture(url: string, isR18 = false) {
   const _path = path.resolve(process.cwd(), './src/.koishi/setu')
   const reg = /^(.*)\/([^\/]*)$/
   reg.exec(url)
   const p = RegExp.$1 // 路径
   const n = RegExp.$2 // 文件名
   downloadImageToBase64(url).then(res => {
-    const filePath = path.resolve(_path, p.replace('https://i.pixiv.cat/', ''))
+    let filePath = ''
+    if (!isR18) {
+      filePath = path.resolve(_path, p.replace('https://i.pixiv.cat/', ''))
+    } else {
+      filePath = path.resolve(`${_path}/r18`, p.replace('https://i.pixiv.cat/', ''))
+    }
     if (!fs.existsSync(filePath)) {
       mkdirp.sync(filePath)
     }
