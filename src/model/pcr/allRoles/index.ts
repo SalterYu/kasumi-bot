@@ -2,12 +2,15 @@ import PcrRolesData from '../../../assets/pcr-roles'
 import PcrRole from "../role";
 import axios from "axios";
 import FormData from "form-data"
+import Log from "../../../utils/log";
+import { dateFtt, random } from "@utils";
 
+const schedule = require('node-schedule');
 const allRoles = PcrRolesData.map(item => new PcrRole(item))
 
 async function getRoles() {
   const res = await axios('http://api.yobot.xyz/v2/nicknames/?type=csv')
-  return res.data.split('\n').map((item: string) => item.split(','))
+  return res.data.split('\n').map((item: string) => item.split(',')).map((item: any) => new PcrRole(item))
 }
 
 class AllRoles {
@@ -15,6 +18,27 @@ class AllRoles {
 
   constructor() {
     this.allRoles = allRoles
+    this._updateRoleMap()
+    this._startJob()
+  }
+
+  _updateRoleMap() {
+    getRoles().then(res => {
+      Log.Info('已更新角色表')
+      this.allRoles = res
+    })
+  }
+
+  _startJob() {
+    let rule = new schedule.RecurrenceRule();
+    rule.date = 1
+    rule.hour = 0
+    rule.minute = 0
+    rule.second = 0
+    schedule.scheduleJob(rule, async () => {
+      Log.Info('开始更新角色数据表')
+      this._updateRoleMap()
+    })
   }
 
   searchRoleByAlia(key: string) {
