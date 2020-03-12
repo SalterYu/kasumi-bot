@@ -7,6 +7,7 @@ import { dateFtt, random } from '@utils'
 import { downloadImageToBase64 } from '../../utils/image'
 import { getPathsToTry } from 'tsconfig-paths/lib/try-path'
 import Log from '../../utils/log'
+
 const fs = require('fs')
 const path = require('path')
 const mkdirp = require('mkdirp')
@@ -18,6 +19,7 @@ const schedule = require('node-schedule')
 })
 class Setu extends BasePlugin {
   setuUserSet: Set<number>
+  setuQueue: any[] = []
 
   constructor(bot: Bot) {
     super(bot)
@@ -44,35 +46,36 @@ class Setu extends BasePlugin {
           message: msgMap[random(1, 4)],
         })
       }
-      const apiKey = this.$bot.config.loliConApiKey
-      const ageType = this.$bot.config.ageType
-      if (!apiKey) {
+      const { loliConApiKey, ageType, picNum } = this.$bot.config
+      if (!loliConApiKey) {
         return this.sendMessage({
           group_id: data.group_id,
           message: '主人不让我找setu，都怪他！！',
         })
       }
       this.setuUserSet.add(userId)
-      const res = await axios.get(
-        `https://api.lolicon.app/setu/?size1200=true&&r18=${ageType ||
-          0}&&apikey=${apiKey}`
-      )
+      if (this.setuQueue.length === 0) {
+        const res = await axios.get(
+          `https://api.lolicon.app/setu/?size1200=true&&r18=${ ageType ||
+          0 }&&apikey=${ loliConApiKey }&&num=${ picNum }`
+        )
+        if (res.data.code !== 0) {
+          return this.sendMessage({
+            group_id: data.group_id,
+            message: res.data.msg,
+          })
+        }
+        this.setuQueue = res.data.data
+        savePictureArr(res.data.data)
+      }
       setTimeout(() => {
         this.setuUserSet.delete(userId)
-      }, 1000 * 60 * 10)
-      const _data: any = res.data
-      if (_data.code !== 0) {
-        return this.sendMessage({
-          group_id: data.group_id,
-          message: _data.msg,
-        })
-      }
-      savePicture(_data.data[0].url, _data.data[0].r18)
-
+      }, 1000 * 60 * 5)
+      const _data: any = this.setuQueue.shift()
       const msg: any = await this.sendMessage({
         group_id: data.group_id,
         // message: '色图'
-        message: MessageManager.image(_data.data[0].url),
+        message: MessageManager.image(_data.url),
       })
       const self = this
       if (msg && msg.status === 'ok') {
@@ -89,11 +92,11 @@ class Setu extends BasePlugin {
             if (msg2.status === 'failed') {
               self.sendMessage({
                 group_id: data.group_id,
-                message: `setu由于过于OOXX，没法发送，建议去pixiv查看，pid：${_data.data[0].pid}`,
+                message: `setu由于过于OOXX，没法发送，建议去pixiv查看，pid：${ _data.pid }`,
               })
             }
           })
-        }, 1000 * 16)
+        }, 1000 * 20)
       }
     }
   }
@@ -106,26 +109,33 @@ function savePicture(url: string, isR18 = false) {
   reg.exec(url)
   const p = RegExp.$1 // 路径
   const n = RegExp.$2 // 文件名
-  downloadImageToBase64(url).then(res => {
+  return downloadImageToBase64(url).then(res => {
     let filePath = ''
     if (!isR18) {
       filePath = path.resolve(_path, p.replace('https://i.pixiv.cat/', ''))
     } else {
-      filePath = path.resolve(`${_path}/r18`, p.replace('https://i.pixiv.cat/', ''))
+      filePath = path.resolve(`${ _path }/r18`, p.replace('https://i.pixiv.cat/', ''))
     }
     if (!fs.existsSync(filePath)) {
       mkdirp.sync(filePath)
     }
     fs.writeFile(
-      path.resolve(filePath, `${n}`),
+      path.resolve(filePath, `${ n }`),
       Buffer.from(res.img64, 'base64'),
-      err => {
+      (err: any) => {
         if (!err) {
           Log.Success('setu save success')
         }
       }
     )
   })
+}
+
+function savePictureArr(arr: any[]) {
+  const prom = arr.map((item: any) => {
+    return savePicture(item.url, item.r18)
+  })
+  Promise.all(prom)
 }
 
 export default Setu
