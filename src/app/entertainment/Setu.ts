@@ -57,6 +57,9 @@ class Setu extends BasePlugin {
         `https://api.lolicon.app/setu/?size1200=true&&r18=${ageType ||
           0}&&apikey=${apiKey}`
       )
+      setTimeout(() => {
+        this.setuUserSet.delete(userId)
+      }, 1000 * 60 * 10)
       const _data: any = res.data
       if (_data.code !== 0) {
         return this.sendMessage({
@@ -80,9 +83,6 @@ class Setu extends BasePlugin {
         // schedule.scheduleJob(rule, async () => {
         //   this.setuUserSet.clear()
         // })
-        setTimeout(() => {
-          this.setuUserSet.delete(userId)
-        }, 1000 * 60 * 10)
         const messageId = msg.data.message_id
         setTimeout(() => {
           this.deleteMsg(messageId).then(msg2 => {
