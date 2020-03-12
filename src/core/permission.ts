@@ -63,7 +63,7 @@ export function checkPerm(bot: Bot, ctx: ICqMessageResponseGroup | ICqMessageRes
     }
   }
   const hasPerm = Boolean(permission_required & permission)
-  if (!hasPerm && ctx.message_type === 'group') {
+  if (!hasPerm && ctx.message_type === 'group' && permission_required) {
     bot.bot('send_group_msg', {
       // message: `权限不足, 您的是${Permission[permission]}, 需要${Permission[permission_required]}`,
       message: "就凭你还想让本萝莉对你唯命是从？？？做我的朋友吧 (x",
