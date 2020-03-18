@@ -31,6 +31,8 @@ class Setu extends BasePlugin {
     data: ICqMessageResponseGroup | ICqMessageResponsePrivate
   ) {
     if (data.message_type === 'private') return
+    const commands = ['来份涩图', '来份色图', '涩图', '色图']
+    if (!this.$bot.checkCommandValid(commands, data)) return
     const userId = data.user_id
     const message = data.raw_message
     const msgMap: { [key in number]: string } = {
@@ -39,7 +41,7 @@ class Setu extends BasePlugin {
       3: `${ MessageManager.at(userId) }\n酝酿个十分钟再冲吧，太快了露娜会嫌弃你的！`,
       4: `${ MessageManager.at(userId) }\n喂喂喂？我都还没有感觉，你就冲了？能不能十分钟后再来？？(ー_ー)!!`
     }
-    if (['来份涩图', '来份色图', '涩图', '色图'].includes(message)) {
+    if (commands.includes(message)) {
       if (this.setuUserSet.has(userId)) {
         return this.sendMessage({
           group_id: data.group_id,

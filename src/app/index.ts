@@ -2,9 +2,6 @@ import BasePlugin from "../core/basePlugin";
 import Bot, { Permission } from "../core";
 import { on_command } from "../decorator";
 
-const pcrRoles = require('../assets/pcr-roles')
-const FormData = require("form-data")
-
 
 export default class Index extends BasePlugin {
   constructor(bot: Bot) {

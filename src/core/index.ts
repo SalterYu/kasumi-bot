@@ -16,6 +16,7 @@ interface Bot extends CQWebSocketOption {
   plugins: any[];
   commands: any[];
   service: Set<Service>
+  blackGroup: Set<number>
 }
 
 class Bot {
@@ -24,6 +25,7 @@ class Bot {
       this.config = initCQWebSocketOptions(props);
     }
     this.service = new Set()
+    this.blackGroup = new Set()
   }
 
   connect() {
@@ -40,6 +42,36 @@ class Bot {
     mkdirp.sync(path)
   }
 
+  setBlackGroup(group_id: number) {
+    this.bot('send_msg', {
+      message: '检测到红包滥用行为，已冻结本群使用我1小时。违规用户将记录黑名单。',
+      group_id,
+    })
+    this.blackGroup.add(group_id)
+    setTimeout(() => {
+      this.removeBlackGroup(group_id)
+      Log.Info(`已解除对群 ${group_id} 的封禁`)
+    }, 1000 * 60 * 60)
+  }
+
+  checkCommandValid(commands: string[], data: ICqMessageResponseGroup | ICqMessageResponsePrivate) {
+    if (data.message_type === 'group') {
+      const message = data.message
+      if (message[0].type === 'hb') {
+        const text = message[0].data.title
+        if (commands.includes(text)) {
+          this.setBlackGroup(data.group_id)
+          return false
+        }
+      }
+    }
+    return true
+  }
+
+  removeBlackGroup(group_id: number) {
+    this.blackGroup.delete(group_id)
+  }
+
   _init() {
     this.bot.on("ready", () => {
       console.log("[WebSocket] 连接成功, 开始加载插件");
@@ -47,6 +79,7 @@ class Bot {
     });
 
     this.bot.on("message", (event, data) => {
+      if (this.blackGroup.has(data.group_id)) return
       this.plugins.forEach((plugin) => {
         const enable = checkServiceEnable(this.service, plugin.constructor.name, data.group_id)
         if (enable) {
