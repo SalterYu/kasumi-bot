@@ -34,11 +34,18 @@ interface ICqMessageAt extends ICqMessage {
   }
 }
 
+interface ICqMessageHb extends ICqMessage {
+  type: 'hb',
+  data: {
+    title: string
+  }
+}
+
 interface ICqMessageResponseGroup {
   anonymous: any
   font: number
   group_id: number
-  message: ICqMessageRawMessageArr | string
+  message: ICqMessageRawMessageArr
   message_id: number
   message_type: 'group'
   post_type: string
@@ -80,4 +87,4 @@ interface ICqMessageResponsePrivate {
   user_id: number
 }
 
-type ICqMessageRawMessageArr = (ICqMessageText | ICqMessageImage | ICqMessageFace | ICqMessageAt)[]
+type ICqMessageRawMessageArr = (ICqMessageText | ICqMessageImage | ICqMessageFace | ICqMessageAt | ICqMessageHb)[]
