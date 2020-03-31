@@ -87,7 +87,8 @@ function on_command(command: string, options: ICommandOptions = {}) {
           if (message[0].type === 'hb') {
             // 表示是红包
             const title = message[0].data.title
-            if (command.indexOf(title) > -1) {
+            console.log(message)
+            if (command.indexOf(title.trim()) > -1) {
               this.$bot.setBlackGroup(data.group_id)
             }
             return
