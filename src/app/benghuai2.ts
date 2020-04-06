@@ -57,6 +57,10 @@ class Benghuai extends BasePlugin {
         message: "三分钟之后再来吧，不然本萝莉会嫌弃你的！(x"
       })
     }
+    if (message.length === 0) return this.sendMessage({
+      group_id: data.group_id,
+      message: '请输入具体的装备名'
+    })
     if (message[0].type === 'text') {
       const param = message[0].data.text
       const group_id = data.group_id
@@ -66,6 +70,10 @@ class Benghuai extends BasePlugin {
         method: "get"
       })
       const _data = res.data
+      if (_data.length === 0) return this.sendMessage({
+        group_id: data.group_id,
+        message: '没有查询到装备信息'
+      })
       if (_data.length) {
         let initMsg = (obj: { title: string, type: string, maxLvDesc: string }, obj1: { title: string, type: string, maxLvDesc: string }) => {
           let msg = ''
