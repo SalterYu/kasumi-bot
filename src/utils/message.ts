@@ -102,4 +102,6 @@ const toTrim = (message: ICqMessageRawMessageArr) => message.map(msg => {
   return msg
 })
 
-export { cqStrToArr, toTrim };
+const filterArgText = (raw_message: string) => raw_message.replace(/(\[.+\])/, '')
+
+export { cqStrToArr, toTrim, filterArgText };
