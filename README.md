@@ -31,11 +31,6 @@
 yarn
 ```
 
-#### 编译
-```vue
-yarn build
-```
-
 #### 运行
 ```vue
 yarn dev
